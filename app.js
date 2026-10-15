@@ -11,10 +11,10 @@ const PORT = 3000;
 // DATABASE CONNECTION
 // =====================================================
 const db = mysql.createConnection({
-    host: "c237-meilan-mysql.mysql.database.azure.com",
-    user: "c237_010",
-    password: "c237010@2026!",
-    database: "c237_010_team2_ca2_project",
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     ssl: { rejectUnauthorized: false }
 });
 
