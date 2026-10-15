@@ -78,9 +78,11 @@ Backend
 - express-session
 - connect-flash
 - Multer
+  
 Database
 - MySQL
 - mysql2
+  
 Deployment
 - Render
 - Azure Database for MySQL
