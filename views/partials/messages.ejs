@@ -1,0 +1,32 @@
+<%# Shows success and error messages created by Express routes. %>
+<% if (typeof successMessages !== "undefined" && successMessages.length > 0) { %>
+    <div
+        class="alert alert-success alert-dismissible fade show"
+        role="alert"
+    >
+        <%= successMessages[0] %>
+
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+        ></button>
+    </div>
+<% } %>
+
+<% if (typeof errorMessages !== "undefined" && errorMessages.length > 0) { %>
+    <div
+        class="alert alert-danger alert-dismissible fade show"
+        role="alert"
+    >
+        <%= errorMessages[0] %>
+
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+        ></button>
+    </div>
+<% } %>

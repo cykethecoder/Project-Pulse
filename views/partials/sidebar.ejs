@@ -1,0 +1,78 @@
+<%# Shared side navigation shown after login. %>
+<%
+    const sidebarRole = typeof currentProjectRole !== "undefined" ? currentProjectRole : null;
+    const hasSelectedProject = typeof selectedProject !== "undefined" && selectedProject;
+    const activePath = typeof currentPath !== "undefined" ? currentPath : "";
+    const isActive = path => activePath === path || activePath.startsWith(path + "/");
+    const navClass = (...paths) => paths.some(isActive) ? " active" : "";
+%>
+
+<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark collapse min-vh-100 shadow-sm">
+    <div class="position-sticky pt-3 h-100 d-flex flex-column justify-content-between">
+        
+        <div>
+            <ul class="nav flex-column gap-1">
+                <li class="sidebar-label">Workspace</li>
+                <li class="nav-item">
+                    <a class="nav-link text-white<%= navClass('/projects') %>" href="/projects">
+                        <span class="nav-icon" aria-hidden="true">&#8644;</span><span>Select Project</span>
+                    </a>
+                </li>
+
+                <% if (hasSelectedProject) { %>
+                    <li class="nav-item">
+                        <a class="nav-link text-white<%= navClass('/dashboard') %>" href="/dashboard"><span class="nav-icon" aria-hidden="true">&#8962;</span><span>Dashboard</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white<%= navClass('/tasks', '/addtask') %>" href="/tasks"><span class="nav-icon" aria-hidden="true">&#10003;</span><span>Tasks</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white<%= navClass('/meetings') %>" href="/meetings"><span class="nav-icon" aria-hidden="true">&#9673;</span><span>Meetings</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white<%= navClass('/retrospective') %>" href="/retrospective"><span class="nav-icon" aria-hidden="true">&#8634;</span><span>Retrospective</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white<%= navClass('/resources') %>" href="/resources"><span class="nav-icon" aria-hidden="true">&#128206;</span><span>Resources</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white<%= navClass('/calendar') %>" href="/calendar"><span class="nav-icon" aria-hidden="true">&#9638;</span><span>Calendar</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white<%= navClass('/timeline') %>" href="/timeline"><span class="nav-icon" aria-hidden="true">&#8942;</span><span>Timeline</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white<%= navClass('/notifications') %>" href="/notifications"><span class="nav-icon" aria-hidden="true">&#9679;</span><span>Notifications</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white<%= navClass('/project-members') %>" href="/project-members"><span class="nav-icon" aria-hidden="true">&#9786;</span><span>Project Members</span></a>
+                    </li>
+                <% } %>
+
+                <li class="sidebar-label mt-3">Your account</li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white<%= activePath === '/profile' ? ' active' : '' %>" href="/profile"><span class="nav-icon" aria-hidden="true">&#9787;</span><span>My Profile</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white<%= navClass('/achievements') %>" href="/achievements"><span class="nav-icon" aria-hidden="true">&#9733;</span><span>Achievements</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white<%= navClass('/profile/change-password') %>" href="/profile/change-password"><span class="nav-icon" aria-hidden="true">&#9670;</span><span>Change Password</span></a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="mb-4">
+            <hr class="border-secondary my-3">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-danger fw-medium" href="/logout">
+                        <span class="nav-icon" aria-hidden="true">&#8594;</span><span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</nav>

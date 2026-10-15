@@ -1,0 +1,85 @@
+<%# Shared top navigation with user and selected-project details. %>
+<%
+    // Use null when a page does not provide one of these shared values.
+    const navbarUser = typeof currentUser !== "undefined" ? currentUser : null;
+    const navbarProject = typeof selectedProject !== "undefined" ? selectedProject : null;
+    const navbarRole = typeof currentProjectRole !== "undefined" ? currentProjectRole : null;
+%>
+
+<nav class="navbar navbar-dark bg-primary sticky-top shadow-sm">
+    <div class="container-fluid">
+
+        <% if (navbarUser) { %>
+            <button
+                class="navbar-toggler d-md-none me-2"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#sidebarMenu"
+                aria-controls="sidebarMenu"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        <% } %>
+
+        <a
+            class="navbar-brand fw-bold"
+            href="<%= navbarProject ? '/dashboard' : '/projects' %>"
+        >
+            <span class="brand-mark" aria-hidden="true">P</span>
+            <span>ProjectPulse</span>
+        </a>
+
+        <% if (navbarUser) { %>
+            <div class="ms-auto d-flex align-items-center gap-3">
+
+                <% if (navbarProject) { %>
+                    <div class="text-end d-none d-lg-block text-white">
+                        <div class="small fw-semibold">
+                            <%= navbarProject.projectName %>
+                        </div>
+
+                        <div class="small opacity-75">
+                            <%= navbarRole %>
+                        </div>
+                    </div>
+                <% } %>
+
+                <% if (navbarProject) { %>
+                    <a href="/notifications" class="text-white position-relative text-decoration-none" title="Notifications" aria-label="Notifications">
+                        <span class="fs-4" aria-hidden="true">&#128276;</span>
+                        <% if (typeof notificationCount !== "undefined" && notificationCount > 0) { %>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"><%= notificationCount %></span>
+                        <% } %>
+                    </a>
+                <% } %>
+
+                <a
+                    href="/profile"
+                    class="text-decoration-none d-flex align-items-center gap-2 text-white"
+                >
+                    <img
+                        src="<%= navbarUser.profilePicture || '/images/profile-pictures/default-profile.svg' %>"
+                        alt="Profile picture"
+                        class="rounded-circle border border-white"
+                        width="40"
+                        height="40"
+                        style="object-fit: cover;"
+                    >
+
+                    <span class="d-none d-sm-inline fw-semibold">
+                        <%= navbarUser.name %>
+                    </span>
+                </a>
+
+                <%# Opens the existing logout confirmation page. %>
+                <a href="/logout" class="btn btn-sm btn-danger">
+                    Logout
+                </a>
+
+            </div>
+        <% } %>
+
+    </div>
+</nav>
