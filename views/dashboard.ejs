@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<%# Project dashboard with progress, deadlines, meetings and activity. %>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/resources/styles.css">
+</head>
+
+<body class="bg-light">
+
+    <%- include("partials/navbar") %>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <%- include("partials/sidebar") %>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+
+                <%- include("partials/messages") %>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <h1 class="h2 mb-1"><%= selectedProject.projectName %></h1>
+
+        <p class="text-muted mb-0">
+            Welcome back, <%= user.name %>.
+            Your role is <strong><%= currentProjectRole %></strong>.
+        </p>
+    </div>
+
+    <div class="dashboard-actions d-flex align-items-center gap-2">
+        <% if (currentProjectRole === "Project Leader") { %>
+            <form
+                action="/projects/<%= selectedProject.projectId %>/assignmember"
+                method="POST"
+                class="member-assign-form d-flex align-items-center gap-2"
+            >
+                <select name="userId" class="form-select form-select-sm" required>
+                    <option value="" selected disabled>Add a member to the project</option>
+
+                    <% users.forEach(user => { %>
+                        <option value="<%= user.userId %>">
+                            <%= user.username %>
+                        </option>
+                    <% }) %>
+                </select>
+
+                <button type="submit" class="btn btn-sm btn-primary text-nowrap">
+                    Add Member
+                </button>
+            </form>
+        <% } %>
+
+        <a href="/projects" class="btn btn-sm btn-outline-primary text-nowrap">
+            Change Project
+        </a>
+    </div>
+</div>
+
+                <%# Searches tasks and meetings inside the selected project. %>
+                <form action="/search" method="GET" class="card card-body mb-4 p-3">
+                    <div class="input-group">
+                        <input type="search" name="query" class="form-control" placeholder="Search tasks or meetings..." aria-label="Search tasks or meetings" required>
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </form>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <p class="text-muted mb-2">Completion Percentage</p>
+                                <h2 class="fw-bold"><%= dashboard.completionPercentage %>%</h2>
+                                <div class="progress">
+                                    <div class="progress-bar" 
+                                         role="progressbar" 
+                                         aria-label="Completion percentage"
+                                         aria-valuenow="<%= dashboard.completionPercentage %>" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100"
+                                         data-progress="<%= dashboard.completionPercentage %>">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <p class="text-muted mb-2">Team Productivity</p>
+                                <h2 class="fw-bold"><%= dashboard.teamProductivity %>%</h2>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" 
+                                         role="progressbar" 
+                                         aria-label="Team productivity"
+                                         aria-valuenow="<%= dashboard.teamProductivity %>" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100"
+                                         data-progress="<%= dashboard.teamProductivity %>">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <p class="text-muted mb-2">Total Tasks</p>
+                                <h2 class="fw-bold"><%= dashboard.totalTasks %></h2>
+                                <p class="text-muted mb-0 small">Tasks in the selected project</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-7">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                                <h2 class="h5 mb-0">Upcoming Deadlines</h2>
+                                <a href="/tasks" class="btn btn-sm btn-outline-primary">View All Tasks</a>
+                            </div>
+                            <div class="card-body">
+                                <% if (upcomingDeadlines.length === 0) { %>
+                                    <div class="alert alert-light border mb-0">No upcoming deadlines.</div>
+                                <% } else { %>
+                                    <div class="table-responsive">
+                                        <table class="table align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>Task</th>
+                                                    <th>Status</th>
+                                                    <th>Due Date</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% upcomingDeadlines.forEach(function (task) { %>
+                                                    <tr>
+                                                        <td><%= task.taskName %></td>
+                                                        <td>
+                                                            <span class="badge bg-light text-dark border"><%= task.status %></span>
+                                                        </td>
+                                                        <td><%= new Date(task.dueDate).toLocaleDateString("en-SG") %></td>
+                                                        <td>
+                                                            <div class="btn-group gap-1">
+                                                                <a href="/tasks/<%= task.taskId %>" class="btn btn-sm btn-outline-primary">View</a>
+                                                                <% if (currentProjectRole === "Project Leader") { %>
+                                                                    <a href="/tasks/<%= task.taskId %>/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                                                <% } %>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                <% }); %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                                <h2 class="h5 mb-0">Meetings This Week</h2>
+                                <% if (currentProjectRole === "Project Leader") { %>
+                                    <a href="/meetings/add" class="btn btn-sm btn-primary">Schedule</a>
+                                <% } %>
+                            </div>
+                            <div class="card-body">
+                                <% if (meetingsThisWeek.length === 0) { %>
+                                    <div class="alert alert-light border mb-0">No meetings scheduled this week.</div>
+                                <% } else { %>
+                                    <div class="list-group list-group-flush">
+                                        <% meetingsThisWeek.forEach(function (meeting) { %>
+                                            <div class="list-group-item px-0 py-3">
+                                                <h3 class="h6 mb-1 fw-bold"><%= meeting.meetingTitle %></h3>
+                                                <p class="small text-muted mb-2">
+                                                    <%= new Date(meeting.meetingDate).toLocaleDateString("en-SG") %> at <%= meeting.meetingTime %>
+                                                </p>
+                                                <div class="d-flex gap-2">
+                                                    <a href="/meetings/<%= meeting.meetingId %>" class="btn btn-sm btn-outline-primary">View</a>
+                                                    <% if (currentProjectRole === "Project Leader") { %>
+                                                        <a href="/meetings/<%= meeting.meetingId %>/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                                        <form action="/meetings/<%= meeting.meetingId %>/delete" method="POST" onsubmit="return confirm('Delete this meeting?');" class="d-inline">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                                        </form>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h2 class="h5 mb-0">Recent Activities</h2>
+                            </div>
+                            <div class="card-body">
+                                <% if (recentActivities.length === 0) { %>
+                                    <div class="alert alert-light border mb-0">No recent activities.</div>
+                                <% } else { %>
+                                    <div class="list-group list-group-flush">
+                                        <% recentActivities.forEach(function (activity) { %>
+                                            <div class="list-group-item px-0 d-flex justify-content-between align-items-center gap-3">
+                                                <span class="text-secondary"><%= activity.description %></span>
+                                                <small class="text-muted text-nowrap">
+                                                    <%= activity.createdAtText %>
+                                                </small>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <%# Appears once after the user selects a project. %>
+                <% if (showRemindersPopup && reminders.length > 0) { %>
+                    <div class="modal fade" id="remindersModal" tabindex="-1" aria-labelledby="remindersModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content border-0 shadow-lg">
+                                <div class="modal-header bg-primary text-white">
+                                    <h2 class="modal-title fs-5" id="remindersModalLabel">Upcoming Reminders</h2>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="text-muted">Tasks and meetings coming up for <strong><%= selectedProject.projectName %></strong>.</p>
+                                    <div class="list-group">
+                                        <% reminders.forEach(function (reminder) { %>
+                                            <div class="list-group-item d-flex justify-content-between align-items-center gap-3">
+                                                <div><strong><%= reminder.title %></strong><div class="small text-muted"><%= reminder.message %></div></div>
+                                                <span class="badge <%= reminder.type === 'meeting' ? 'text-bg-info' : 'text-bg-warning' %>"><%= reminder.type === 'meeting' ? 'Meeting' : 'Task' %></span>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+
+            </main>
+        </div>
+    </div>
+
+    <%- include("partials/footer") %>
+
+    <script>
+        document.querySelectorAll("[data-progress]").forEach(function (progressBar) {
+            progressBar.style.width = progressBar.dataset.progress + "%";
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <% if (showRemindersPopup && reminders.length > 0) { %>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                new bootstrap.Modal(document.getElementById("remindersModal")).show();
+            });
+        </script>
+    <% } %>
+</body>
+</html>
